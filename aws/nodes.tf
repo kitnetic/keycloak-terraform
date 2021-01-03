@@ -4,10 +4,11 @@ data "template_file" "data_userdata_script" {
   vars = {
     keycloak_ping_bucket    = var.keycloak_ping_bucket
     keycloak_cluster_name   = var.environment
+    keycloak_admin_password = random_password.keycloak-admin-password.result
     cloudwatch_config        = data.template_file.cloudwatch-config.rendered
     keycloak_db_address     = aws_db_instance.main-db.address
     keycloak_db_user        = "keycloak"
-    keycloak_db_password    = random_password.db-admin-password
+    keycloak_db_password    = random_password.db-admin-password.result
     aws_access_key          = local.aws_access_key
     aws_secret_key          = local.aws_secret_key
   }
@@ -32,7 +33,7 @@ resource "aws_launch_template" "keycloak_node_template" {
   }
 
   name_prefix = "keycloak-${var.environment}-node"
-  user_data = data.template_file.data_userdata_script.rendered
+  user_data = base64encode(data.template_file.data_userdata_script.rendered)
   vpc_security_group_ids = concat(list(aws_security_group.keycloak_security_group.id), var.additional_security_groups)
 }
 
@@ -48,8 +49,6 @@ resource "aws_autoscaling_group" "keycloak_nodes" {
   }
 
   vpc_zone_identifier = var.svc_subnet_ids
-
-  depends_on = ["aws_autoscaling_group.master_nodes"]
 
   // load_balancers = [aws_elb.es_data_nodes_lb[0].id]
 

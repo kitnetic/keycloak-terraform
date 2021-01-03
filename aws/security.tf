@@ -13,6 +13,16 @@ resource "aws_secretsmanager_secret_version" "keycloak_pw" {
   secret_string = random_password.keycloak-admin-password.result
 }
 
+resource "aws_secretsmanager_secret" "keycloak_db_secret" {
+  name = "${var.environment}-keycloak-db"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret_version" "keycloak_db" {
+  secret_id = aws_secretsmanager_secret.keycloak_db_secret.id
+  secret_string = random_password.db-admin-password.result
+}
+
 
 data "aws_secretsmanager_secret" "keycloakd_bucket_access" {
   name = "${var.environment}-keycloak-bucket-access"

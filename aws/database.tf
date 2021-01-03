@@ -27,12 +27,12 @@ resource "random_password" "db-admin-password" {
 }
 
 resource "aws_security_group" "db_security_group" {
-  name = "main-db-${var.environment}-security-group"
-  description = "Elasticsearch ports with ssh"
+  name = "keycloak-db-${var.environment}-security-group"
+  description = "access to keycloaks DB"
   vpc_id = var.vpc_id
 
   tags = {
-    Name = "main-db-${var.environment}-security-group"
+    Name = "keycload-db-${var.environment}-security-group"
     UrEnv = var.environment
   }
 
@@ -41,7 +41,7 @@ resource "aws_security_group" "db_security_group" {
     from_port = 3306
     to_port = 3306
     protocol = "tcp"
-    security_groups = [aws_security_group.keycloak_security_group]
+    security_groups = [aws_security_group.keycloak_security_group.id]
   }
 
   ingress {
@@ -56,7 +56,7 @@ resource "aws_security_group" "db_security_group" {
 provider "mysql" {
   endpoint = "${aws_db_instance.main-db.address}:3306"
   username = "keycloak"
-  password = random_password.db-admin-password
+  password = random_password.db-admin-password.result
 }
 
 resource "mysql_database" "keycloak" {
