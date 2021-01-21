@@ -40,16 +40,18 @@ resource "aws_launch_template" "keycloak_node_template" {
 resource "aws_autoscaling_group" "keycloak_nodes" {
   name = "keycloak-${var.environment}-nodes"
   max_size = 3
-  min_size = 2
-  desired_capacity = 2
+  min_size = 0
+  desired_capacity = 1
   default_cooldown = 30
   force_delete = true
   launch_template {
     id = aws_launch_template.keycloak_node_template.id
+    version = "$Latest"
   }
 
   vpc_zone_identifier = var.svc_subnet_ids
 
+  target_group_arns = [aws_lb_target_group.keycloak-tg.arn]
   // load_balancers = [aws_elb.es_data_nodes_lb[0].id]
 
   tag {

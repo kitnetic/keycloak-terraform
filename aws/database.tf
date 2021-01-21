@@ -53,14 +53,18 @@ resource "aws_security_group" "db_security_group" {
   }
 }
 
+
 provider "mysql" {
   endpoint = "${aws_db_instance.main-db.address}:3306"
   username = "keycloak"
   password = random_password.db-admin-password.result
 }
 
+
 resource "mysql_database" "keycloak" {
   name = "keycloak"
 }
+
+
 
 

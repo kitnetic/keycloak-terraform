@@ -52,3 +52,7 @@ variable "additional_security_groups" {
 variable "ssh_key_name" {
   type = string
 }
+
+variable "certificate_arn" {
+  type = string
+}

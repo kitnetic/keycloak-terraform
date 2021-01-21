@@ -58,14 +58,22 @@ resource "aws_security_group" "keycloak_security_group" {
     cidr_blocks       = local.source_cidr_blocks
   }
 
-
-  # intra-cluster communication
+  # traffic from load balancer
   ingress {
     description = ""
     from_port         = 8080
     to_port           = 8080
     protocol          = "tcp"
-    security_groups = []
+    security_groups = [aws_security_group.keycloak_loadbalancer_sg.id]
+  }
+
+  # internal traffic
+  ingress {
+    description = ""
+    from_port         = 8080
+    to_port           = 8080
+    protocol          = "tcp"
+    cidr_blocks       = local.source_cidr_blocks
   }
 
   # intra-cluster communication
